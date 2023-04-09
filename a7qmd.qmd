@@ -1,0 +1,75 @@
+---
+title: "assignment 7"
+author: "Chen Ling"
+format: html
+editor: visual
+execute: 
+  echo: false 
+  warning: false
+  message: false
+---
+
+```{r }
+library(googledrive)
+library(tidyverse)
+library(data.table) ## For the fread function
+library(lubridate)
+library(knitr)
+
+source("sepsis_monitor_functions.R")
+```
+
+## task4
+
+```{r}
+drive_deauth()
+file_link <- "https://drive.google.com/file/d/16CPL21wWAJoIAu6hVEAo4MJKByGpBhag/view?usp=share_link"
+## All data up until now
+new_data <- updateData(file_link)
+
+## Include only most recent data
+most_recent_data <- new_data %>%
+  group_by(PatientID) %>%
+  filter(obsTime == max(obsTime))
+
+```
+
+## Current date and time
+
+```{r}
+Sys.time()
+```
+
+## A table listing the patients who currently have sepsis (if any), along with their most recent heart rate, temperature, and respiratory rate
+
+```{r}
+q1<-most_recent_data%>%filter(SepsisLabel==1)%>%select(PatientID,HR,Temp,Resp)
+kable(q1)
+```
+
+## Plots for all patients who have sepsis (if any) that show the complete history of their heart rate, temperature, and respiratory rate during their time in the ICU.
+
+```{r}
+q2=new_data%>%filter(SepsisLabel==1)
+plothr<-ggplot(data=q2,aes(x=ICULOS,y=HR,color=PatientID))+
+  geom_point()+
+  geom_line()
+plottemp<-ggplot(data=q2,aes(x=ICULOS,y=Temp,color=PatientID))+
+  geom_point()+
+  geom_line()
+plotresp<-ggplot(data=q2,aes(x=ICULOS,y=Resp,color=PatientID))+
+  geom_point()+
+  geom_line()
+plothr;plottemp;plotresp
+```
+
+## A table showing the change in heart rate, temperature, and respiratory rate between the last two measurements for all patients
+
+```{r}
+q3<-new_data%>%group_by(PatientID)%>%summarise(mean=mean(ICULOS))%>%filter(mean>0)%>%select(PatientID)
+q31<-new_data%>%right_join(q3,by = "PatientID")%>%mutate(laghr=lag(HR),lagtemp=lag(Temp),lagresp=lag(Resp))%>%
+  mutate(diffhr=HR-laghr,difftemp=Temp-lagtemp,diffresp=Resp-lagresp)%>%
+  group_by(PatientID)%>%summarise_all(last)%>%select(PatientID,diffhr,difftemp,diffresp)
+kable(q31)
+  
+```
