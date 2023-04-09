@@ -40,9 +40,6 @@ jobs:
         with:
             packages:
                any::knitr
-               any::rmarkdown
-               any::dplyr
-               any::ggplot2
                any::readr
                any::lubridate
                any::data.table
@@ -52,8 +49,8 @@ jobs:
       - name: Render document
         uses: quarto-dev/quarto-actions/render@v2
         with:
-          to: gfm
-          path: README.qmd
+          to: HTML
+          path: a7qmd.qmd
 
       - name: Setup git config
         run: |
