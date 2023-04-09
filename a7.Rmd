@@ -1,0 +1,74 @@
+---
+title: "a7"
+author: "Chen Ling"
+date: "2023-04-08"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(data.table) ## For the fread function
+library(lubridate)
+library(tictoc)
+
+source("sepsis_monitor_functions.R")
+```
+
+## task2
+### 50 fread
+```{r}
+tic()
+makeSepsisDataset(n=50,read_fn = "fread")
+toc()
+```
+### 50 read_delim
+```{r}
+tic()
+makeSepsisDataset(n=50,read_fn = "read_delim")
+toc()
+```
+### 100 fread
+```{r}
+tic()
+makeSepsisDataset(n=100,read_fn = "fread")
+toc()
+```
+### 100 read_delim
+```{r}
+tic()
+makeSepsisDataset(n=100,read_fn = "read_delim")
+toc()
+```
+### 500 fread
+```{r}
+tic()
+makeSepsisDataset(n=500,read_fn = "fread")
+toc()
+```
+### 500 read_delim
+```{r}
+tic()
+makeSepsisDataset(n=500,read_fn = "read_delim")
+toc()
+```
+
+
+## task3
+
+
+```{r}
+library(googledrive)
+
+df <- makeSepsisDataset()
+
+# We have to write the file to disk first, then upload it
+df %>% write_csv("sepsis_data_temp.csv")
+
+# Uploading happens here
+sepsis_file <- drive_upload(media = "sepsis_data_temp.csv",
+          path ="https://drive.google.com/drive/u/2/folders/1jMLkHkD6ektoWjfhvPBJnU75mwH2VnIT",
+          name = "sepsis_data.csv")
+
+# Set the file permissions so anyone can download this file.
+sepsis_file %>% drive_share_anyone()
+```
