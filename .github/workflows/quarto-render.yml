@@ -7,8 +7,8 @@
 # additional example workflows available for the R community.
 
 on:
-  schedule:
-    - cron:  '0 * * * *'
+  #schedule:
+   # - cron:  '0 * * * *'
   push:
     branches: main
   workflow_dispatch:
